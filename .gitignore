@@ -1,0 +1,56 @@
+# Python bytecode files
+__pycache__/
+*.pyc
+*.pyo
+rest_OAS_all.json
+rest_OAS_all_postman.json
+# Virtual environment
+venv/
+env/
+.venv/
+.env/
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Pytest
+.cache/
+
+# Coverage report
+*.cover
+*.coverage
+.coverage.*
+*.hypothesis/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Environment variables
+.env
+
+# Log files
+*.log
+
+
+# Test-related files
+*.tox/
+*.nox/
+*.coverage
+nosetests.xml
+coverage.xml
+*.hypothesis/
+
+# pipenv
+Pipfile.lock
+
+secrets.txt
+
+rest_OAS_all - Copy.json
+OAS.json
+OAS_updated.json

@@ -17,3 +17,7 @@ python-docx
 reportlab
 langgraph
 langfuse
+elevenlabs
+sounddevice
+scipy
+streamlit-mic-recorder

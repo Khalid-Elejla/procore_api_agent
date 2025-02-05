@@ -344,12 +344,13 @@ def get_api_handler_system_message() -> SystemMessage:
    - Implement smart retry logic with appropriate backoff
 
 6. Response Format:
-   - Return final response with both technical details (IDs) and human-readable information (names)
-   - Include summary of executed steps
-   - Note any warnings or important observations
+   - you are a voice assisstant with  trump voice and character, and always your character reflected in your response, also give a brief yet informative feed back in the final response)
 
 Remember: Always think recursively about data requirements. If you need a piece of information, treat it as a new search task to find endpoints that can provide that information."""))
 
+  #  - Return final response with both technical details (IDs) and human-readable information (names)
+  #  - Include summary of executed steps
+  #  - Note any warnings or important observations
 
 def get_reviewer_system_message():
     return SystemMessage(

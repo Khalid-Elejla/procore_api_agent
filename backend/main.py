@@ -7,8 +7,8 @@ from .utils.helper_functions import get_langfuse_handler #, suppress_print
 from .graphs.graph import build_graph
 
 # Main execution
-def run_agent_graph(query: str) -> str:
-
+# def run_agent_graph(query: str) -> str:
+def run_agent_graph(query):
   # query = "give more information about Grashavyr Boogodyr"
   
   # Initialize Langfuse handler (assuming you are storing the keys in .env)
@@ -27,7 +27,19 @@ def run_agent_graph(query: str) -> str:
 
   # result = assistant_graph.invoke({"query": query, "messages": []}, config={"callbacks": [langfuse_handler],"thread_id": "1"},)
   # result = assistant_graph.invoke(Command(resume=True), config={"callbacks": [langfuse_handler],"thread_id": "1"},)
-  result = assistant_graph.invoke({"query": query, "messages": []}, config={"callbacks": [langfuse_handler],"thread_id": "1"})
+
+  # result = assistant_graph.invoke({"query": query, "messages": []}, config={"callbacks": [langfuse_handler],"thread_id": "1"})
+  import logging
+  import traceback
+  logging.info(type(query))
+  try:
+    result = assistant_graph.invoke({"voice_query": query, "messages": []}, config={"thread_id": "1"})
+  except Exception as e:
+    # logging.error(f"query: {query}")
+    logging.error(f"query type: {type(query)}")
+
+    logging.error(f"Error occurred in build_graph: {e}")
+    logging.error("Traceback details:\n" + traceback.format_exc())
 #   try:
 #     result = assistant_graph.invoke({"query": query, "messages": []}, config={"callbacks": [langfuse_handler],"thread_id": "1"})
 #   except Exception as e:
@@ -41,6 +53,7 @@ def run_agent_graph(query: str) -> str:
 
   # # Display the result
   # result['messages'][-1].pretty_print()
+
   return result['messages'][-1]
 
 

@@ -28,9 +28,114 @@ from langgraph.types import interrupt, Command
 def APIHandlerAgent(state: Dict[str, Any]) -> Dict[str, Any]:
 
     # Initialize LLM using function from openai_models.py
-    llm = load_openai_model()
-    api_spec_file = 'OAS.json'
+    llm = load_openai_model(model="gpt-4o-mini")
+    # llm = load_openai_model(model="gpt-4o")
+
+    api_spec_file = 'OAS_updated.json'
     base_url = "https://sandbox.procore.com"
+    useful_endpoints="""
+  ('GET /rest/v1.1/projects',
+  'Return a list of active Projects.\n\nIf the authenticated user has full company admin permissions the request will return all of the projects in the company. If the user does not have full company admin permissions, the request will only return the projects that the user has been added to.\nThe default pagination is 100 projects per page. The max page size is 300 projects due to the size of the data in the response.\n\nSee [Filtering on List Actions](https://developers.procore.com/documentation/filtering-on-list-actions) for information on using the filtering capabilities provided by this endpoint.',
+  {'description': 'Return a list of active Projects.\n\nIf the authenticated user has full company admin permissions the request will return all of the projects in the company. If the user does not have full company admin permissions, the request will only return the projects that the user has been added to.\nThe default pagination is 100 projects per page. The max page size is 300 projects due to the size of the data in the response.\n\nSee [Filtering on List Actions](https://developers.procore.com/documentation/filtering-on-list-actions) for information on using the filtering capabilities provided by this endpoint.',
+   'parameters': [{'name': 'Procore-Company-Id',
+     'in': 'header',
+     'description': 'Unique company identifier associated with the Procore User Account.',
+     'required': True,
+     'schema': {'type': 'integer'}},
+    {'name': 'company_id',
+     'in': 'query',
+     'description': 'Unique identifier for the company.',
+     'required': True,
+     'schema': {'type': 'integer'}}]}),
+  ('GET /rest/v1.3/users',
+  'Return a list of all Users associated with a Company.\n\nSee [Filtering on List Actions](https://developers.procore.com/documentation/filtering-on-list-actions) for information on using the filtering capabilities provided by this endpoint.',
+  {'description': 'Return a list of all Users associated with a Company.\n\nSee [Filtering on List Actions](https://developers.procore.com/documentation/filtering-on-list-actions) for information on using the filtering capabilities provided by this endpoint.',
+   'parameters': [{'name': 'Procore-Company-Id',
+     'in': 'header',
+     'description': 'Unique company identifier associated with the Procore User Account.',
+     'required': True,
+     'schema': {'type': 'integer'}},
+    {'name': 'company_id',
+     'in': 'query',
+     'description': 'Unique identifier for the company.',
+     'required': True,
+     'schema': {'type': 'integer'}}]}),
+    [('POST /rest/v1.0/task_items',
+  'Creates a task item on a given project',
+  {'description': 'Creates a task item on a given project',
+   'parameters': [{'name': 'Procore-Company-Id',
+     'in': 'header',
+     'description': 'Unique company identifier associated with the Procore User Account.',
+     'required': True,
+     'schema': {'type': 'integer'}},
+    {'name': 'project_id',
+     'in': 'query',
+     'description': 'Unique identifier for the project.',
+     'required': True,
+     'schema': {'type': 'integer'}}],
+   'requestBody': {'content': {'application/json': {'schema': {'type': 'object',
+       'required': ['task_item'],
+       'properties': {'task_item': {'type': 'object',
+         'properties': {'title': {'type': 'string',
+           'description': 'Title',
+           'example': 'Safety audit of sector 7G'},
+          'number': {'type': 'string',
+           'description': 'Number',
+           'example': '1B'},
+          'description': {'type': 'string',
+           'description': 'Description',
+           'example': 'Perform full audit to determine safety compliance in 7G'},
+          'due_date': {'type': 'string',
+           'format': 'date-time',
+           'description': 'Date and time due'},
+          'status': {'type': 'string',
+           'description': 'Status',
+           'enum': ['initiated',
+            'in_progress',
+            'ready_for_review',
+            'closed',
+            'void']},
+          'task_item_category_id': {'type': 'integer',
+           'description': 'The task item category to associate with the task item.'},
+          'private': {'type': 'boolean', 'description': 'Privacy flag'},
+          'assigned_id': {'type': 'integer', 'description': 'Assignee ID'},
+          'assignee_ids': {'type': 'array',
+           'description': 'Assignee IDs',
+           'items': {'type': 'integer'}},
+          'distribution_member_ids': {'type': 'array',
+           'description': 'Distribution Member IDs',
+           'items': {'type': 'integer'}},
+          'attachments': {'type': 'array',
+           'description': 'Task Item attachments.\nTo upload attachments you must upload the entire payload as `multipart/form-data` content-type and\nspecify each parameter as form-data together with `attachments[]` as files.',
+           'items': {'type': 'string'}},
+          'drawing_revision_ids': {'type': 'array',
+           'description': 'Drawing Revisions to attach to the response',
+           'items': {'type': 'integer'},
+           'example': [4, 5]},
+          'file_version_ids': {'type': 'array',
+           'description': 'File Versions to attach to the response',
+           'items': {'type': 'integer'},
+           'example': [6, 7]},
+          'form_ids': {'type': 'array',
+           'description': 'Forms to attach to the response',
+           'items': {'type': 'integer'},
+           'example': [7, 8]},
+          'image_ids': {'type': 'array',
+           'description': 'Images to attach to the response',
+           'items': {'type': 'integer'},
+           'example': [9, 10]},
+          'upload_ids': {'type': 'array',
+           'description': 'Uploads to attach to the response',
+           'items': {'type': 'string'},
+           'example': ['4120226e-36a8-416f-970e-880bae78164f',
+            'de07e35a-4860-4f96-acd8-8360833dc495']},
+          'document_management_document_revision_ids': {'type': 'array',
+           'description': 'PDM document to attach to the response',
+           'items': {'type': 'string'},
+           'example': ['4120226e-36a8-416f-970e-880bae78164f',
+            'de07e35a-4860-4f96-acd8-8360833dc495']}}}}}}},
+    'required': True}}),   
+    """
     overrides = {"servers": [{"url": base_url}]}
 
     if 'access_token' not in st.session_state:
@@ -46,8 +151,8 @@ def APIHandlerAgent(state: Dict[str, Any]) -> Dict[str, Any]:
 
 
     query = state["query"]
-    messages = state["messages"]
-    command = state["command"]
+    # messages = state["messages"]
+    # command = state["command"]
     api_agent_messages = state["api_agent_messages"]
     api_agent_feedback = state["api_agent_feedback"]
 
@@ -76,7 +181,7 @@ def APIHandlerAgent(state: Dict[str, Any]) -> Dict[str, Any]:
             if msg.type == "tool"
         ]
     except:
-        st.write("jnnj")
+
         last_tool_messages = []
 
     # Process tool messages and gather feedback
@@ -85,26 +190,38 @@ def APIHandlerAgent(state: Dict[str, Any]) -> Dict[str, Any]:
             data_frame_metadata = msg.artifact
             api_feedback_message += f"\n tool output: {msg.content}"
         else:
-            st.write(
-                "msggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg",
-                msg.content,
-            )
+            # st.write(
+            #     "msggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg",
+            #     msg.content,
+            # )
             api_feedback_message += f"\n tool output: {msg.content}"
 
+
+#     api_handler_prompt = f"""
+#   here is the user original query
+#   - query: {query}
+
+#   - command to execute: {command}
+
+#     API configuration:
+#     Base url: {base_url}
+#     User Company id: {company_id}
+#     note that you can use the api call to get some messing values needed for the next api call
+  
+#   """
 
     api_handler_prompt = f"""
   here is the user original query
   - query: {query}
 
-  - command to execute: {command}
-
     API configuration:
     Base url: {base_url}
     User Company id: {company_id}
+    useful endpoints: {useful_endpoints}
     note that you can use the api call to get some messing values needed for the next api call
-  
+    now give me your final response to deliver to the user (try to be helpful and friendly),
+    stick with the url from the endpoint list
   """
-    #   - feedback: {api_agent_feedback} + {api_feedback_message}
 
     message = HumanMessage(content=api_handler_prompt)
     
@@ -158,11 +275,11 @@ def APIHandlerAgent(state: Dict[str, Any]) -> Dict[str, Any]:
         return_dict = {
             "messages": [response],
             "api_agent_messages": [response],
-            "command": command,
+            # "command": command,
             "feedback": [
                 {
                     "agent": "api_handler",
-                    "command": command,
+                    # "command": command,
                     "response": feedback_message,
                     "status": "Success",
                 }
@@ -176,7 +293,7 @@ def APIHandlerAgent(state: Dict[str, Any]) -> Dict[str, Any]:
         error_msg = HumanMessage(content=str(e))
         return {
             "api_agent_messages": [error_msg],
-            "command": command,
+            # "command": command,
             "feedback": [
                 {
                     "status": "error",

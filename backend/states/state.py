@@ -25,6 +25,19 @@ import pandas as pd
 #     available_tables: List[str]    # List of queryable table names
 #     error: Optional[str]
 
+
+
+
+
+class UnifiedState(TypedDict):
+    # messages: Annotated[List[BaseMessage], add]
+    voice_query: Optional[bytes]
+    query: str
+    api_agent_messages: Annotated[list[AnyMessage], operator.add]
+    audio_messages: Annotated[List[bytes], operator.add]
+
+    audio_inputs: Optional[bytes]
+    audio_outputs: Optional[bytes]
 class DataFrameMetadata(TypedDict):
     description: str
     df_id: str
@@ -62,18 +75,18 @@ class AgentResponse(TypedDict):
     success: bool
 class GraphState(TypedDict):
   query: str
-  plan: List[PlanStep]
-  command: str
-  approved: bool  # New field to track approval status
+#   plan: List[PlanStep]
+#   command: str
+#   approved: bool  # New field to track approval status
   # current_task: AgentState
-  feedback:Annotated[List[AgentResponse], operator.add]
-  db_agent_feedback:Annotated[List[str], operator.add]
+#   feedback:Annotated[List[AgentResponse], operator.add]
+#   db_agent_feedback:Annotated[List[str], operator.add]
   api_agent_feedback:Annotated[List[str], operator.add]
-  answer:AnswerState
+#   answer:AnswerState
   messages: Annotated[List[AnyMessage], operator.add]
-  sql_agent_messages: Annotated[list[AnyMessage], operator.add]
+#   sql_agent_messages: Annotated[list[AnyMessage], operator.add]
   api_agent_messages: Annotated[list[AnyMessage], operator.add]
-  data_frames_metadata: Annotated[List[DataFrameMetadata], operator.add]
+#   data_frames_metadata: Annotated[List[DataFrameMetadata], operator.add]
   # sql_agent_messages: Annotated[List[AnyMessage], operator.add]
 
 class AgentGraphState(TypedDict):

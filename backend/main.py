@@ -33,7 +33,7 @@ def run_agent_graph(query):
   import traceback
   logging.info(type(query))
   try:
-    result = assistant_graph.invoke({"voice_query": query, "messages": []}, config={"thread_id": "1"})
+    result = assistant_graph.invoke({"voice_query": query, "messages": []}, config={"callbacks": [langfuse_handler],"thread_id": "1"})
   except Exception as e:
     # logging.error(f"query: {query}")
     logging.error(f"query type: {type(query)}")

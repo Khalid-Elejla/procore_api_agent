@@ -17,6 +17,7 @@ from langgraph.graph import StateGraph, MessagesState, END, START
 from langchain_core.messages import HumanMessage, SystemMessage
 from ..states.state import UnifiedState
 
+import streamlit as st
 # Initialize OpenAI client
 openai_client = OpenAI()
 
@@ -80,12 +81,14 @@ def record_audio_until_stop(state: UnifiedState):
        model="whisper-1", 
     #    file=audio_bytes,
        file=audio_file,
+       language="en" 
     )
 
     # Print the transcription
     logging.info("Here is the transcription:", transcription.text)
 
     # Write to messages 
+    st.write(f"User: {transcription.text}")
     return {"query": [HumanMessage(content=transcription.text)]}
 
 

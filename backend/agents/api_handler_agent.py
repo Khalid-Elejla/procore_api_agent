@@ -23,51 +23,26 @@ from langgraph.types import interrupt, Command
 
 # Define search tool
 # search = get_search_tool()
-
-
-def APIHandlerAgent(state: Dict[str, Any]) -> Dict[str, Any]:
-
-    # Initialize LLM using function from openai_models.py
-    llm = load_openai_model(model="gpt-4o-mini")
-    # llm = load_openai_model(model="gpt-4o")
-
-    api_spec_file = 'OAS_updated.json'
-    base_url = "https://sandbox.procore.com"
-    useful_endpoints="""
+useful_endpoints="""
   ('GET /rest/v1.1/projects',
-  'Return a list of active Projects.\n\nIf the authenticated user has full company admin permissions the request will return all of the projects in the company. If the user does not have full company admin permissions, the request will only return the projects that the user has been added to.\nThe default pagination is 100 projects per page. The max page size is 300 projects due to the size of the data in the response.\n\nSee [Filtering on List Actions](https://developers.procore.com/documentation/filtering-on-list-actions) for information on using the filtering capabilities provided by this endpoint.',
-  {'description': 'Return a list of active Projects.\n\nIf the authenticated user has full company admin permissions the request will return all of the projects in the company. If the user does not have full company admin permissions, the request will only return the projects that the user has been added to.\nThe default pagination is 100 projects per page. The max page size is 300 projects due to the size of the data in the response.\n\nSee [Filtering on List Actions](https://developers.procore.com/documentation/filtering-on-list-actions) for information on using the filtering capabilities provided by this endpoint.',
-   'parameters': [{'name': 'Procore-Company-Id',
-     'in': 'header',
-     'description': 'Unique company identifier associated with the Procore User Account.',
-     'required': True,
-     'schema': {'type': 'integer'}},
+  {'description': 'Return a list of active Projects.
+   'parameters': [
     {'name': 'company_id',
      'in': 'query',
      'description': 'Unique identifier for the company.',
      'required': True,
      'schema': {'type': 'integer'}}]}),
   ('GET /rest/v1.3/users',
-  'Return a list of all Users associated with a Company.\n\nSee [Filtering on List Actions](https://developers.procore.com/documentation/filtering-on-list-actions) for information on using the filtering capabilities provided by this endpoint.',
-  {'description': 'Return a list of all Users associated with a Company.\n\nSee [Filtering on List Actions](https://developers.procore.com/documentation/filtering-on-list-actions) for information on using the filtering capabilities provided by this endpoint.',
-   'parameters': [{'name': 'Procore-Company-Id',
-     'in': 'header',
-     'description': 'Unique company identifier associated with the Procore User Account.',
-     'required': True,
-     'schema': {'type': 'integer'}},
-    {'name': 'company_id',
+  {'description': 'Return a list of all Users associated with a Company.
+   'parameters': [
+   {'name': 'company_id',
      'in': 'query',
      'description': 'Unique identifier for the company.',
      'required': True,
      'schema': {'type': 'integer'}}]}),
     [('POST /rest/v1.0/task_items',
-  'Creates a task item on a given project',
   {'description': 'Creates a task item on a given project',
-   'parameters': [{'name': 'Procore-Company-Id',
-     'in': 'header',
-     'description': 'Unique company identifier associated with the Procore User Account.',
-     'required': True,
-     'schema': {'type': 'integer'}},
+   'parameters': [
     {'name': 'project_id',
      'in': 'query',
      'description': 'Unique identifier for the project.',
@@ -136,6 +111,16 @@ def APIHandlerAgent(state: Dict[str, Any]) -> Dict[str, Any]:
             'de07e35a-4860-4f96-acd8-8360833dc495']}}}}}}},
     'required': True}}),   
     """
+
+def APIHandlerAgent(state: Dict[str, Any]) -> Dict[str, Any]:
+
+    # Initialize LLM using function from openai_models.py
+    llm = load_openai_model(model="gpt-4o-mini")
+    # llm = load_openai_model(model="gpt-4o")
+
+    api_spec_file = 'OAS_updated.json'
+    base_url = "https://sandbox.procore.com"
+    
     overrides = {"servers": [{"url": base_url}]}
 
     if 'access_token' not in st.session_state:
@@ -151,12 +136,13 @@ def APIHandlerAgent(state: Dict[str, Any]) -> Dict[str, Any]:
 
 
     query = state["query"]
+
     # messages = state["messages"]
     # command = state["command"]
     api_agent_messages = state["api_agent_messages"]
     api_agent_feedback = state["api_agent_feedback"]
 
-    sys_msg = get_api_handler_system_message()
+    sys_msg = get_api_handler_system_message(company_id, base_url, useful_endpoints)
 
 #================================================================================================
     import yaml
@@ -190,10 +176,6 @@ def APIHandlerAgent(state: Dict[str, Any]) -> Dict[str, Any]:
             data_frame_metadata = msg.artifact
             api_feedback_message += f"\n tool output: {msg.content}"
         else:
-            # st.write(
-            #     "msggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg",
-            #     msg.content,
-            # )
             api_feedback_message += f"\n tool output: {msg.content}"
 
 
@@ -210,21 +192,30 @@ def APIHandlerAgent(state: Dict[str, Any]) -> Dict[str, Any]:
   
 #   """
 
-    api_handler_prompt = f"""
-  here is the user original query
-  - query: {query}
+#     api_handler_prompt = f"""
+#   here is the user original query
+#   - query: {query}
 
-    API configuration:
-    Base url: {base_url}
-    User Company id: {company_id}
-    useful endpoints: {useful_endpoints}
-    note that you can use the api call to get some messing values needed for the next api call
-    now give me your final response to deliver to the user (try to be helpful and friendly),
-    stick with the url from the endpoint list
-  """
+#     API configuration:
+#     Base url: {base_url}
+#     User Company id: {company_id}
+#   """
+    # useful endpoints that you may or may not need to use: {useful_endpoints}
+    # note that you can use the api call to get some messing values needed for the next api call,
+    # stick with the url from the endpoint list
 
-    message = HumanMessage(content=api_handler_prompt)
-    
+#     api_handler_prompt = f"""
+#   here is the user original query
+#   - query: {query}
+#   """
+    # useful endpoints that you may or may not need to use: {useful_endpoints}
+    # note that you can use the api call to get some messing values needed for the next api call,
+    # stick with the url from the endpoint list
+
+    message = HumanMessage(content=f"{query}")
+    # message = query
+
+
     try:
         response = llm_with_tools.invoke([sys_msg, message]+api_agent_messages )
 

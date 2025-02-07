@@ -115,7 +115,7 @@ useful_endpoints="""
 def APIHandlerAgent(state: Dict[str, Any]) -> Dict[str, Any]:
 
     # Initialize LLM using function from openai_models.py
-    llm = load_openai_model(model="gpt-4o-mini")
+    llm = load_openai_model(model="gpt-4o")
     # llm = load_openai_model(model="gpt-4o")
 
     api_spec_file = 'OAS_updated.json'

@@ -100,27 +100,35 @@ def play_audio(state: UnifiedState):
     try:
         logging.info(state)
         response = state['api_agent_messages'][-1]
-
     except:
         logging.info(state)
         response = state['api_agent_messages'][-1]
     # Prepare text by replacing ** with empty strings
     # These can cause unexpected behavior in ElevenLabs
     cleaned_text = response.content.replace("**", "")
+    st.write(f"assistant: {cleaned_text}")
     
-    # Call text_to_speech API with turbo model for low latency
-    response = elevenlabs_client.text_to_speech.convert(
-        voice_id="pNInz6obpgDQGcFmaJgB", # Adam pre-made voice
-        output_format="mp3_22050_32",
-        text=cleaned_text,
-        model_id="eleven_turbo_v2_5", 
-        voice_settings=VoiceSettings(
-            stability=0.0,
-            similarity_boost=1.0,
-            style=0.0,
-            use_speaker_boost=True,
-        ),
+
+    import openai
+    response = openai.audio.speech.create(
+        model="tts-1",
+        voice="alloy",  # Other voices: "echo", "fable", "onyx", "nova", "shimmer"
+        input=cleaned_text
     )
+    response=response.read()
+    # Call text_to_speech API with turbo model for low latency
+    # response = elevenlabs_client.text_to_speech.convert(
+    #     voice_id="pNInz6obpgDQGcFmaJgB", # Adam pre-made voice
+    #     output_format="mp3_22050_32",
+    #     text=cleaned_text,
+    #     model_id="eleven_turbo_v2_5", 
+    #     voice_settings=VoiceSettings(
+    #         stability=0.0,
+    #         similarity_boost=1.0,
+    #         style=0.0,
+    #         use_speaker_boost=True,
+    #     ),
+    # )
     
     # Play the audio back
     play(response)

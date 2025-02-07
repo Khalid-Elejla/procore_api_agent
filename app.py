@@ -79,27 +79,39 @@ def main():
 
                 # Show thinking spinner below all messages
                 with st.spinner("Thinking..."):
-                    response = run_agent_graph(query=query)
+                    try:
+                        response = run_agent_graph(query=query)
+                        logging.error("response",type(response),response)
 
-                    st.session_state.messages.append({
-                        "user": query if isinstance(query, str) else "(Audio message)",
-                        "assistant": response.content
-                    })
+                        st.session_state.messages.append({
+                            "user": query if isinstance(query, str) else "(Audio message)",
+                            "assistant": response
+                        })
+                    except Exception as e:
+                        logging.error(f"An error occurred: {str(e)}")
+
 
                 # Display the new assistant response
-                st.chat_message("assistant").markdown(f"**Assistant:** {response.content}")
+                st.chat_message("assistant").markdown(f"**Assistant:** {response}")
 
                 # # Play the audio response
                 # play_audio(response)
 
         except Exception as e:
+            logging.error(f"An error occurred: {str(e)}")
             st.error(f"An error occurred: {str(e)}")
+
+            raise RuntimeError("Graph building failed") from e 
             clear_auth_state()
             st.rerun()
+
+
 
     else:
         st.warning("Please authenticate to continue.")
         st.stop()
+
+
 
 if __name__ == "__main__":
     main()

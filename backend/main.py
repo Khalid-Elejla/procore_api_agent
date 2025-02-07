@@ -34,7 +34,7 @@ def run_agent_graph(query):
 
   # result = assistant_graph.invoke({"query": query, "messages": []}, config={"callbacks": [langfuse_handler],"thread_id": "1"})
   import base64
-  
+
   # Convert bytes to Base64 string
   query = base64.b64encode(query).decode('utf-8')
   try:
@@ -59,10 +59,9 @@ def run_agent_graph(query):
 
   # # Display the result
   # result['messages'][-1].pretty_print()
-
+  a=result['messages'][-1]
+  logging.error(a)
   return result['messages'][-1]
-
-
 
 if __name__ == "__main__":
     run_agent_graph()

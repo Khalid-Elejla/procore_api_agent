@@ -145,4 +145,5 @@ def play_audio(state: UnifiedState):
     
     # Play the audio back
     play(response)
+    return {'messages':[cleaned_text]}
 

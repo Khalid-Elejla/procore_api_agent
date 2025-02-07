@@ -18,6 +18,9 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from ..states.state import UnifiedState
 
 import streamlit as st
+from langchain_core.runnables import RunnableConfig
+import base64
+
 # Initialize OpenAI client
 openai_client = OpenAI()
 
@@ -25,8 +28,18 @@ openai_client = OpenAI()
 elevenlabs_client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
 
 def record_audio_until_stop(state: UnifiedState):
+
+    # Retrieve audio bytes from metadata
+    # audio_bytes = config.get("metadata", {}).get("audio_bytes")
+
     logging.info("Here is the transcription:", type(state))
+    
+
     audio_bytes=state['voice_query']
+
+
+    # Convert Base64 string back to bytes
+    audio_bytes = base64.b64decode(audio_bytes)
 
     # """Records audio from the microphone until Enter is pressed, then saves it to a .wav file."""
     

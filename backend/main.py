@@ -1,6 +1,10 @@
 import os
 from dotenv import load_dotenv
 
+import logging
+import traceback
+
+
 load_dotenv()
 
 from .utils.helper_functions import get_langfuse_handler #, suppress_print
@@ -29,11 +33,13 @@ def run_agent_graph(query):
   # result = assistant_graph.invoke(Command(resume=True), config={"callbacks": [langfuse_handler],"thread_id": "1"},)
 
   # result = assistant_graph.invoke({"query": query, "messages": []}, config={"callbacks": [langfuse_handler],"thread_id": "1"})
-  import logging
-  import traceback
-  logging.info(type(query))
+  import base64
+  
+  # Convert bytes to Base64 string
+  query = base64.b64encode(query).decode('utf-8')
   try:
-    result = assistant_graph.invoke({"voice_query": query, "messages": []}, config={"callbacks": [langfuse_handler],"thread_id": "1"})
+    # result = assistant_graph.invoke({"voice_query": query, "messages": []}, config={"callbacks": [langfuse_handler],"thread_id": "1"})
+    result = assistant_graph.invoke({"voice_query": query, "messages": []}, config={"callbacks": [langfuse_handler],"thread_id": "1",})
   except Exception as e:
     # logging.error(f"query: {query}")
     logging.error(f"query type: {type(query)}")

@@ -1,5 +1,6 @@
 # app/interface.py
 import os
+import logging
 import streamlit as st
 from datetime import datetime
 from backend.main import run_agent_graph
@@ -53,9 +54,9 @@ def main():
             # Chat input for user messages
             col1, col2 = st.columns([0.85, 0.15])
             with col1:
-                user_input = st.chat_input("Type your question here...")
+                text_query = st.chat_input("Type your question here...")
             with col2:
-                audio = mic_recorder(
+                voice_query = mic_recorder(
                     start_prompt="🎤 Speak",
                     stop_prompt="⏹️ Stop",
                     format="wav",
@@ -64,48 +65,106 @@ def main():
 
             # Set the access token as an environment variable
             os.environ['access_token'] = access_token
-
-            if user_input or audio:
-                # Display the new user message immediately
-                if user_input:
-                    st.chat_message("user").markdown(f"**You:** {user_input}")
-                    query = user_input
-                elif audio:
-                    st.chat_message("user").markdown("**You:** (Audio message)")
-                    query = audio['bytes']  # Assuming the audio is sent as bytes
-                    import logging
-                    logging.info(type(query))
+#=================================================================================================================
+        #     if text_query or voice_query:
+        #         # Display the new user message immediately
+        #         if text_query:
+        #             st.chat_message("user").markdown(f"**You:** {text_query}")
+        #             query = text_query
+        #         elif voice_query:
+        #             st.chat_message("user").markdown("**You:** (Audio message)")
+        #             query = voice_query['bytes']  # Assuming the audio is sent as bytes
+                    
+        #             logging.info(type(query))
                     
 
-                # Show thinking spinner below all messages
+        #         # # Show thinking spinner below all messages
+        #         # with st.spinner("Thinking..."):
+        #         #     try:
+        #         #         response = run_agent_graph(query=query)
+        #         #         logging.error("response",type(response),response)
+
+        #         #         st.session_state.messages.append({
+        #         #             "user": query if isinstance(query, str) else "(Audio message)",
+        #         #             "assistant": response
+        #         #         })
+        #         #     except Exception as e:
+        #         #         logging.error(f"An error occurred: {str(e)}")
+
+
+        #         # Show thinking spinner below all messages
+        #         with st.spinner("Thinking..."):
+        #             try:
+        #                 if text_query:
+        #                     response = run_agent_graph(query=query, query_type="text")
+        #                 elif voice_query:
+        #                     response = run_agent_graph(query=query, query_type="voice")
+
+        #                 logging.error("response",type(response),response)
+
+        #                 st.session_state.messages.append({
+        #                     "user": query if isinstance(query, str) else "(Audio message)",
+        #                     "assistant": response
+        #                 })
+        #             except Exception as e:
+        #                 logging.error(f"An error occurred: {str(e)}")
+
+
+        #         # Display the new assistant response
+        #         st.chat_message("assistant").markdown(f"**Assistant:** {response}")
+
+        #         # # Play the audio response
+        #         # play_audio(response)
+
+        # except Exception as e:
+        #     logging.error(f"An error occurred: {str(e)}")
+        #     st.error(f"An error occurred: {str(e)}")
+
+        #     raise RuntimeError("Graph building failed") from e 
+        #     clear_auth_state()
+        #     st.rerun()
+#=================================================================================================================
+            if text_query or voice_query:
+                # Determine query type and prepare components
+                if text_query:
+                    query = text_query
+                    query_type = "text"
+                    user_message = f"**You:** {text_query}"
+                else:  # voice_query exists
+                    query = voice_query['bytes']
+                    query_type = "voice"
+                    user_message = "**You:** (Audio message)"
+
+                # Display user message immediately
+                st.chat_message("user").markdown(user_message)
+
+                # Process query
                 with st.spinner("Thinking..."):
                     try:
-                        response = run_agent_graph(query=query)
-                        logging.error("response",type(response),response)
+                        response = run_agent_graph(query, query_type)
+                        logging.info(f"Response type: {type(response)}, content: {response}")
 
+                        # Update session state
                         st.session_state.messages.append({
-                            "user": query if isinstance(query, str) else "(Audio message)",
+                            "user": text_query or "(Audio message)",
                             "assistant": response
                         })
+
+                        # Display assistant response
+                        st.chat_message("assistant").markdown(f"**Assistant:** {response}")
                     except Exception as e:
-                        logging.error(f"An error occurred: {str(e)}")
-
-
-                # Display the new assistant response
-                st.chat_message("assistant").markdown(f"**Assistant:** {response}")
-
-                # # Play the audio response
-                # play_audio(response)
-
-        except Exception as e:
-            logging.error(f"An error occurred: {str(e)}")
-            st.error(f"An error occurred: {str(e)}")
-
-            raise RuntimeError("Graph building failed") from e 
+                        logging.error(f"An error occurred: {str(e)}", exc_info=True)
+                        st.error(f"An error occurred: {str(e)}")
+                        raise RuntimeError("Graph building failed") from e
+        except RuntimeError:
             clear_auth_state()
             st.rerun()
 
-
+        except Exception as e:
+            logging.error(f"Unexpected error: {str(e)}", exc_info=True)
+            st.error(f"An unexpected error occurred: {str(e)}")
+            clear_auth_state()
+            st.rerun()
 
     else:
         st.warning("Please authenticate to continue.")

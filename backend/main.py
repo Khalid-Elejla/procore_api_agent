@@ -12,14 +12,14 @@ from .graphs.graph import build_graph
 
 # Main execution
 # def run_agent_graph(query: str) -> str:
-def run_agent_graph(query):
+def run_agent_graph(query, query_type="text"):
   # query = "give more information about Grashavyr Boogodyr"
   
   # Initialize Langfuse handler (assuming you are storing the keys in .env)
   langfuse_handler = get_langfuse_handler()
 
   # Build the state graph
-  assistant_graph = build_graph()
+  assistant_graph = build_graph(query_type)
   
   access_token = os.getenv('access_token')
   company_id = os.getenv('PROCORE_COMPANY_ID')

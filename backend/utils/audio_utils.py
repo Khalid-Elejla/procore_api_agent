@@ -32,8 +32,8 @@ def record_audio_until_stop(state: UnifiedState):
     # Retrieve audio bytes from metadata
     # audio_bytes = config.get("metadata", {}).get("audio_bytes")
 
-    logging.info("Here is the transcription:", type(state))
-    
+    # logging.info("Here is the transcription:", type(state))
+    logging.info("Here is the transcription: %s", type(state))
 
     audio_bytes=state['voice_query']
 
@@ -111,10 +111,10 @@ def play_audio(state: UnifiedState):
 
     # Response from the agent 
     try:
-        logging.info(state)
+        # logging.info(state)
         response = state['api_agent_messages'][-1]
     except:
-        logging.info(state)
+        # logging.info(state)
         response = state['api_agent_messages'][-1]
     # Prepare text by replacing ** with empty strings
     # These can cause unexpected behavior in ElevenLabs

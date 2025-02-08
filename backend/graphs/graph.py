@@ -233,7 +233,7 @@ def build_base_graph() -> StateGraph:
 
     return builder
 
-def build_audio_graph(base_graph: StateGraph) -> StateGraph:
+def build_voice_enabled_graph(base_graph: StateGraph) -> StateGraph:
     """Wrap base graph with audio processing nodes"""
     main_builder = StateGraph(UnifiedState)
     checkpointer = MemorySaver()
@@ -251,18 +251,25 @@ def build_audio_graph(base_graph: StateGraph) -> StateGraph:
 
     return main_builder.compile(checkpointer=checkpointer)
 
-def build_graph():
+def build_graph(query_type = "text"):
     """Main function to build and return the complete graph"""
     try:
         logger.info("Initializing graph components...")
         
         # Initialize core components
         load_openai_model()  # Ensure model is loaded
-        base_graph = build_base_graph()
-        react_graphs = build_audio_graph(base_graph)
+        if query_type == "text":
+            base_graph = build_base_graph()
+            graph = base_graph
+        elif query_type == "voice":
+            base_graph = build_base_graph()
+            voice_enabled_graph = build_voice_enabled_graph(base_graph)
+            graph= voice_enabled_graph
 
         logger.info("Graph built successfully!")
-        return react_graphs
+
+
+        return graph
     
     except Exception as e:
         logger.error(f"Graph construction failed: {str(e)}", exc_info=True)

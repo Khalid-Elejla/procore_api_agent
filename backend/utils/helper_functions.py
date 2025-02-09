@@ -12,13 +12,12 @@ from packaging import version
 import re
 from typing import List, Tuple, Dict
 
-
 # Define the langfuse handler (using environment variables for secret keys)
 def get_langfuse_handler() -> CallbackHandler:
     secret_key = os.getenv("LANGFUSE_SECRET_KEY")
     public_key = os.getenv("LANGFUSE_PUBLIC_KEY")
     host = os.getenv("LANGFUSE_HOST")
-    return CallbackHandler(secret_key=secret_key, public_key=public_key, host=host)
+    return CallbackHandler(secret_key=secret_key, public_key=public_key, host=host,)
 
 # Define a context manager to suppress print statements
 @contextlib.contextmanager

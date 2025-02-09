@@ -193,10 +193,11 @@ def initialize_environment():
         st.session_state.access_token = None
         
     return {
-        'company_id': os.getenv("PROCORE_COMPANY_ID"),
         'access_token': st.session_state.access_token,
-        'api_spec_file': 'OAS_updated.json',
-        'base_url': "https://sandbox.procore.com"
+        'company_id': os.getenv("PROCORE_COMPANY_ID"),
+        'api_spec_file': os.getenv("PROCORE_API_SPEC_FILE"),
+        'base_url': os.getenv("PROCORE_API_BASE_URL"),
+        'OPENAI_API_KEY': os.getenv("OPENAI_API_KEY")
     }
 
 def create_api_tools(config: dict):
@@ -256,6 +257,10 @@ def build_graph(query_type = "text"):
     try:
         logger.info("Initializing graph components...")
         
+        # Load environment variables
+        load_dotenv()
+        # OPENAI_API_KEY=os.getenv("OPENAI_API_KEY")
+
         # Initialize core components
         load_openai_model()  # Ensure model is loaded
         if query_type == "text":

@@ -21,19 +21,28 @@ import streamlit as st
 from langchain_core.runnables import RunnableConfig
 import base64
 
+from dotenv import load_dotenv
+load_dotenv()
+OPENAI_API_KEY=os.getenv("OPENAI_API_KEY")
+
+
 # Initialize OpenAI client
 openai_client = OpenAI()
 
 # Initialize ElevenLabs client
 elevenlabs_client = ElevenLabs(api_key=os.getenv("ELEVENLABS_API_KEY"))
 
+
+# from langfuse.decorators import observe
+ 
+# @observe(capture_input=False, capture_output=False)
 def record_audio_until_stop(state: UnifiedState):
 
     # Retrieve audio bytes from metadata
     # audio_bytes = config.get("metadata", {}).get("audio_bytes")
 
     # logging.info("Here is the transcription:", type(state))
-    logging.info("Here is the transcription: %s", type(state))
+    # logging.info(f"Here is the transcription: {type(state)}")
 
     audio_bytes=state['voice_query']
 
@@ -87,7 +96,7 @@ def record_audio_until_stop(state: UnifiedState):
 
     audio_file = io.BytesIO(audio_bytes)
     audio_file.name = "audio.mp3"
-    logging.info("Here is the transcription:", type(audio_bytes))
+    # logging.info(f"Here is the transcription: {type(audio_bytes)}")
 
     # Transcribe via Whisper
     transcription = openai_client.audio.transcriptions.create(
@@ -98,7 +107,7 @@ def record_audio_until_stop(state: UnifiedState):
     )
 
     # Print the transcription
-    logging.info("Here is the transcription:", transcription.text)
+    logging.info(f"Here is the user transcription: {transcription.text}")
 
     # Write to messages 
     st.write(f"User: {transcription.text}")

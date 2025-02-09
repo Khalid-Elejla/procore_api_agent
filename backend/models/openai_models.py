@@ -3,11 +3,12 @@
 import os
 from langchain_openai import ChatOpenAI
 
-# Load API keys (environment variables can be set before running the app)
-OPENAI_API_KEY=os.getenv("OPENAI_API_KEY")
-
 # Function to initialize the OpenAI LLM with API key
-def load_openai_model(temperature=0, model="gpt-4o-mini"):
+def load_openai_model(temperature=0, model="gpt-4o-mini", api_key=None):
+    
+    # Load API keys (environment variables can be set before running the app)
+    OPENAI_API_KEY=os.getenv("OPENAI_API_KEY")
+    
     if OPENAI_API_KEY:
         return ChatOpenAI(temperature=temperature, model=model)
     else:

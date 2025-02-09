@@ -232,7 +232,7 @@ def build_base_graph() -> StateGraph:
         {"tools": "api_tools", "__end__": END}
     )
 
-    return builder
+    return builder.compile()
 
 def build_voice_enabled_graph(base_graph: StateGraph) -> StateGraph:
     """Wrap base graph with audio processing nodes"""
@@ -240,7 +240,7 @@ def build_voice_enabled_graph(base_graph: StateGraph) -> StateGraph:
     checkpointer = MemorySaver()
 
     # Add audio processing nodes
-    main_builder.add_node("subgraph", base_graph.compile())
+    main_builder.add_node("subgraph", base_graph)
     main_builder.add_node("audio_input", record_audio_until_stop)
     main_builder.add_node("audio_output", play_audio)
 
@@ -266,6 +266,7 @@ def build_graph(query_type = "text"):
         if query_type == "text":
             base_graph = build_base_graph()
             graph = base_graph
+            # graph = base_graph.compile()  # Compile the graph
         elif query_type == "voice":
             base_graph = build_base_graph()
             voice_enabled_graph = build_voice_enabled_graph(base_graph)

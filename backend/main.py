@@ -108,6 +108,7 @@
 # if __name__ == "__main__":
 #     run_agent_graph()
 #============================================================================================================================
+#main.py
 import os
 import base64
 import logging
@@ -146,15 +147,19 @@ def run_agent_graph(query: str | bytes, query_type: str = "text") -> str:
     # Conditionally include langfuse handler only for text queries
     config = {
         "callbacks": [graph_manager.langfuse_handler] if query_type == "text" else [],
-        "thread_id": "1"
+        "thread_id": "2"
     }
 
     try:
         if query_type == "voice":
             query = base64.b64encode(query).decode('utf-8')
-            input_data = {"voice_query": query, "messages": []}
+            # input_data = {"voice_query": query, "messages": []}
+            input_data = {"voice_query": query}
+
         else:
-            input_data = {"query": query, "messages": []}
+            # input_data = {"query": query, "messages": []}
+            input_data = {"query": query}
+
 
         assistant_graph = graph_manager.get_graph(query_type)
         result = assistant_graph.invoke(input_data, config=config)

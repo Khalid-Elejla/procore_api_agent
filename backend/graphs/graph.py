@@ -163,7 +163,7 @@
 #         raise RuntimeError("Graph building failed") from e 
 #====================================================================================================================================
 
-# main.py
+# graph.py
 import os
 import logging
 from typing import Optional
@@ -231,8 +231,8 @@ def build_base_graph() -> StateGraph:
         lambda state: custom_tools_condition(state, message_key="api_agent_messages"),
         {"tools": "api_tools", "__end__": END}
     )
-
-    return builder.compile()
+    checkpointer = MemorySaver()
+    return builder.compile(checkpointer)
 
 def build_voice_enabled_graph(base_graph: StateGraph) -> StateGraph:
     """Wrap base graph with audio processing nodes"""
@@ -251,6 +251,7 @@ def build_voice_enabled_graph(base_graph: StateGraph) -> StateGraph:
     main_builder.add_edge("audio_output", END)
 
     return main_builder.compile(checkpointer=checkpointer)
+    #return main_builder.compile()
 
 def build_graph(query_type = "text"):
     """Main function to build and return the complete graph"""

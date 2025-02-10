@@ -32,13 +32,15 @@ import pandas as pd
 class UnifiedState(TypedDict):
     # messages: Annotated[List[BaseMessage], add]
     voice_query: Optional[bytes]
-    messages: Annotated[List[str], operator.add]
     query: str
-    api_agent_messages: Annotated[list[AnyMessage], operator.add]
-    audio_messages: Annotated[List[bytes], operator.add]
 
-    audio_inputs: Optional[bytes]
-    audio_outputs: Optional[bytes]
+    api_agent_messages: Annotated[list[AnyMessage], operator.add]
+    messages: Annotated[List[str], operator.add]
+
+    # audio_messages: Annotated[List[bytes], operator.add]
+
+    # # audio_inputs: Optional[bytes]
+    # # audio_outputs: Optional[bytes]
 class DataFrameMetadata(TypedDict):
     description: str
     df_id: str

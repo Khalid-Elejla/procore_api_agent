@@ -158,7 +158,7 @@ def run_agent_graph(query: str | bytes, query_type: str = "text") -> str:
 
         assistant_graph = graph_manager.get_graph(query_type)
         result = assistant_graph.invoke(input_data, config=config)
-        answer = result['messages'][-1]
+        answer = result['messages'][-1].content
 
         logger.info(f"Assistant answer: {answer}")
         return answer

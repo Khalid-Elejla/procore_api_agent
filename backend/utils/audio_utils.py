@@ -19,6 +19,7 @@ from ..states.state import UnifiedState
 
 import streamlit as st
 from langchain_core.runnables import RunnableConfig
+from langchain_core.messages import AIMessage
 import base64
 
 from dotenv import load_dotenv
@@ -154,5 +155,8 @@ def play_audio(state: UnifiedState):
     
     # Play the audio back
     play(response)
-    return {'messages':[cleaned_text]}
+
+    # Return AIMessage instead of raw string
+    return {'messages': [AIMessage(content=cleaned_text)]}
+    # return {'messages':[cleaned_text]}
 

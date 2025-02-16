@@ -78,6 +78,7 @@ class AgentResponse(TypedDict):
     success: bool
 class GraphState(TypedDict):
   query: str
+  conversation: Annotated[List[str], operator.add]
 #   plan: List[PlanStep]
 #   command: str
 #   approved: bool  # New field to track approval status

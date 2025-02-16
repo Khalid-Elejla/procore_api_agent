@@ -172,6 +172,7 @@ import streamlit as st
 
 from langgraph.graph import START, StateGraph, END
 from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.sqlite import SqliteSaver
 
 from ..models.openai_models import load_openai_model
 from ..states.state import GraphState, UnifiedState
@@ -232,12 +233,13 @@ def build_base_graph() -> StateGraph:
         {"tools": "api_tools", "__end__": END}
     )
     checkpointer = MemorySaver()
+    # checkpointer = SqliteSaver.from_conn_string("checkpoints.db")
     return builder.compile(checkpointer)
 
 def build_voice_enabled_graph(base_graph: StateGraph) -> StateGraph:
     """Wrap base graph with audio processing nodes"""
     main_builder = StateGraph(UnifiedState)
-    checkpointer = MemorySaver()
+    speech_checkpointer = MemorySaver()
 
     # Add audio processing nodes
     main_builder.add_node("subgraph", base_graph)
@@ -250,7 +252,7 @@ def build_voice_enabled_graph(base_graph: StateGraph) -> StateGraph:
     main_builder.add_edge("subgraph", "audio_output")
     main_builder.add_edge("audio_output", END)
 
-    return main_builder.compile(checkpointer=checkpointer)
+    return main_builder.compile(checkpointer=speech_checkpointer)
     #return main_builder.compile()
 
 def build_graph(query_type = "text"):
@@ -274,7 +276,6 @@ def build_graph(query_type = "text"):
             graph= voice_enabled_graph
 
         logger.info("Graph built successfully!")
-
 
         return graph
     

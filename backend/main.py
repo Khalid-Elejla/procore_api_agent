@@ -143,13 +143,6 @@ graph_manager = AgentGraphManager()
 
 def run_agent_graph(query: str | bytes, query_type: str = "text") -> str:
     """Execute the agent graph based on query type."""
-    # config = {"callbacks": [graph_manager.langfuse_handler], "thread_id": "1"}
-
-    # Conditionally include langfuse handler only for text queries
-    # config = {
-    #     "callbacks": [graph_manager.langfuse_handler] if query_type == "text" else [],
-    #     "thread_id": "2"
-    # }
 
     config = {"callbacks": [graph_manager.langfuse_handler] if query_type == "text" else [], "configurable": {"thread_id": "242"}}
     
@@ -165,44 +158,54 @@ def run_agent_graph(query: str | bytes, query_type: str = "text") -> str:
 
 
         assistant_graph = graph_manager.get_graph(query_type)
-
-        checkpointer = assistant_graph.checkpointer
-        saved_state = checkpointer.get(config)
-        if saved_state:
-            saved_state=saved_state['channel_values']
-            logging.info(f"AAAAAAA {saved_state}")
-        else:
-            logging.info(f"saved_state is empty")
-
-        result = assistant_graph.invoke(input_data,config=config)#{ "configurable": {"thread_id": "241"}})#,config=config)
-        answer = result['messages'][-1].content
-
 #===================================================================================================================================
-        # Log checkpoint data for text queries
-        # checkpointer = assistant_graph.checkpointer
-        # saved_state = checkpointer.get(config)
-        # saved_state=saved_state['channel_values']
-        # logging.info(f"AAAAAAA {saved_state}")
-
         if query_type == "text":
             try:
                 checkpointer = assistant_graph.checkpointer
-                saved_state = checkpointer.get(config)
-                logging.info(f"AAAAAAA {checkpointer}")
-
-#                history = checkpointer.get_history(thread_id="239")
-                # history = checkpointer.get_tuple({"configurable": {"thread_id": "240"}})
-                history = checkpointer.storage.get(242)  # Get full checkpoint list
-
-                logger.info(f"\n🔍 Checkpoint History (Thread 241): {history}")
+                history = assistant_graph.get_state_history({"configurable": {"thread_id": "242"}})
+                logger.info(f"✅ Successfully retrieved checkpoint history for thread 242 - Found {len(list(history))} checkpoints")
+                
+                
+                # logger.info(f"\n🔍 Checkpoint History (Thread 241): {history}")
                 # for idx, entry in enumerate(history, 1):
-                #     logger.info(f"  Checkpoint {idx}:")
-                #     logger.info(f"    Timestamp: {entry['ts']}")
-                #     logger.info(f"    State: {json.dumps(entry['payload'], indent=4)}")
-                #     logger.info("-" * 50)
+
+                #     logger.info(f"Checkpoint {idx}")
+                    
+                #     # Log timestamp
+                #     logger.info(f"** Created at: {entry.created_at}")
+                    
+                #     # Log state values
+                #     state_values = entry.values
+                #     logger.info(">> State Values:")
+                #     logger.info(f"  Conversation: {state_values.get('conversation', [])}")
+                #     logger.info(f"  API Feedback: {state_values.get('api_agent_feedback', [])}")
+                #     logger.info(f"  Messages: {state_values.get('messages', [])}")
+                #     logger.info(f"  API Messages: {state_values.get('api_agent_messages', [])}")
+                    
+                #     # Log next nodes
+                #     logger.info(f">> Next Nodes: {entry.next}")
+                    
+                #     # Log configuration
+                #     config = entry.config.get('configurable', {})
+                #     logger.info("# Configuration:")
+                #     logger.info(f"  Thread ID: {config.get('thread_id', 'N/A')}")
+                #     logger.info(f"  Checkpoint ID: {config.get('checkpoint_id', 'N/A')}")
+                    
+                #     # Log metadata
+                #     metadata = entry.metadata
+                #     logger.info("# Metadata:")
+                #     logger.info(f"  Source: {metadata.get('source', 'N/A')}")
+                #     logger.info(f"  Step: {metadata.get('step', 'N/A')}")
+                #     logger.info(f"  Writes: {metadata.get('writes', {})}")
+                    
+                #     logger.info("-" * 80)
+                    
             except AttributeError:
                 logger.warning("Checkpointer not available for this graph type")
 #===================================================================================================================================
+
+        result = assistant_graph.invoke(input_data,config=config)
+        answer = result['messages'][-1].content
         logger.info(f"Assistant answer: {answer}")
         return answer
 

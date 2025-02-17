@@ -162,7 +162,7 @@ class CustomToolNode(ToolNode):
             raise ValueError("Last message is not an AIMessage")  
 
         tool_calls = [  
-            self._inject_tool_args(call, input, store) for call in message.tool_calls  
+            self.inject_tool_args(call, input, store) for call in message.tool_calls  
         ]  
         return tool_calls, output_type  
 

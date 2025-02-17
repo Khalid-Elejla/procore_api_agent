@@ -22,3 +22,4 @@ sounddevice
 scipy
 streamlit-mic-recorder
 langgraph-checkpoint-sqlite
+sounddevice

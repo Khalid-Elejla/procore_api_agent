@@ -4,6 +4,8 @@ import streamlit as st
 from datetime import datetime, timedelta
 import logging
 
+logger = logging.getLogger(__name__)
+
 # Procore credentials
 PROCORE_CLIENT_ID = os.getenv("PROCORE_CLIENT_ID")
 PROCORE_CLIENT_SECRET = os.getenv("PROCORE_CLIENT_SECRET")
@@ -52,6 +54,7 @@ def refresh_token():
           return False
 
   except Exception as e:
+      logger.info(f"Token refresh error: {str(e)}")
       st.error(f"Token refresh error: {str(e)}")
       clear_auth_state()
       return False
@@ -74,8 +77,6 @@ def authenticate():
 
   # Create the authorization URL
   auth_url = f"{AUTHORIZATION_URL}?client_id={PROCORE_CLIENT_ID}&response_type=code&redirect_uri={REDIRECT_URI}"
-#   logging.error(f"REDIRECT_URI")
-#   logging.error(f"auth_url")
 
   # Check if code is in query params
   query_params = st.query_params

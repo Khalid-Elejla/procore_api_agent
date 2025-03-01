@@ -284,8 +284,7 @@ def handle_api_response(response: Any, human_message: HumanMessage) -> dict:
             "response": feedback_message,
             "status": "Success",
         }],
-        "api_agent_feedback": [api_feedback_message],
-        
+        "api_agent_feedback": [api_feedback_message],        
     }
 
 def APIHandlerAgent(state: Dict[str, Any]) -> Dict[str, Any]:
@@ -324,7 +323,7 @@ def APIHandlerAgent(state: Dict[str, Any]) -> Dict[str, Any]:
             conversation_history = [sys_msg] + conversation_history
 
         # Build message list
-        messages = conversation_history + [human_message]
+        messages = conversation_history[-10:] + [human_message]
 
         # Process existing tool messages
         api_feedback = process_tool_messages(messages)

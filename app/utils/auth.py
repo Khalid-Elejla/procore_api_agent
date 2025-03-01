@@ -7,42 +7,7 @@ import logging
 # Procore credentials
 PROCORE_CLIENT_ID = os.getenv("PROCORE_CLIENT_ID")
 PROCORE_CLIENT_SECRET = os.getenv("PROCORE_CLIENT_SECRET")
-
-uris = [
-      os.getenv("LOCAL_REDIRECT_URI"),
-      os.getenv("PRODUCTION_REDIRECT_URI")
-  ]
-
-
-# Get the current URL using Streamlit's experimental get_query_params
-def get_current_url():
-    
-  try:
-      current_url = st.query_params.get('_stcore_url_', [''])[0]
-      # logging.error("yesooooooo",current_url)
-
-  except:
-      current_url = ''
-      # logging.error("Noooooooo",current_url)
-
-      
-  return current_url
-
-# current_url = get_current_url()
 REDIRECT_URI = os.getenv("LOCAL_REDIRECT_URI")
-
-#current_url = st.get_option("server.baseUrlPath")
-
-
-# if "streamlit.app" in current_url:
-#     logging.error("yes",current_url)
-#     REDIRECT_URI = uris[1]  # Return production URI
-# else:
-#     logging.error("no",current_url)
-#     REDIRECT_URI = uris[0]
-
-# REDIRECT_URI = os.getenv("REDIRECT_URI")
-
 AUTHORIZATION_URL = os.getenv("AUTHORIZATION_URL")
 TOKEN_URL = os.getenv("TOKEN_URL")
 
@@ -92,21 +57,6 @@ def refresh_token():
       return False
 
 def authenticate():
-  
-
-  current_url = st.get_option("server.baseUrlPath")
-
-  if "streamlit.app" in current_url:
-    #   logging.error(f"yes:{current_url}")
-      REDIRECT_URI = os.getenv("PRODUCTION_REDIRECT_URI")
-  else:
-    # logging.error(f"no: {current_url}")
-      REDIRECT_URI = os.getenv("LOCAL_REDIRECT_URI")
-
-  
-  # current_url = get_current_url()
-  #REDIRECT_URI = os.getenv("LOCAL_REDIRECT_URI")
-  REDIRECT_URI = os.getenv("PRODUCTION_REDIRECT_URI")
 
   """Main authentication function"""
   # Check if we have a valid token

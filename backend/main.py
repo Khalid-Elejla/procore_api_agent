@@ -163,7 +163,7 @@ def run_agent_graph(query: str | bytes, query_type: str = "text") -> str:
             try:
                 checkpointer = assistant_graph.checkpointer
                 history = assistant_graph.get_state_history({"configurable": {"thread_id": "242"}})
-                logger.info(f"✅ Successfully retrieved checkpoint history for thread 242 - Found {len(list(history))} checkpoints")
+                logger.info(f"Successfully retrieved checkpoint history for thread 242 - Found {len(list(history))} checkpoints")
                 
                 
                 # logger.info(f"\n🔍 Checkpoint History (Thread 241): {history}")

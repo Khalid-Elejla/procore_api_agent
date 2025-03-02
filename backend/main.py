@@ -115,6 +115,7 @@ import json
 import logging
 import traceback
 from dotenv import load_dotenv
+from langchain_core.messages import HumanMessage
 from .utils.helper_functions import get_langfuse_handler
 from .graphs.graph import build_graph
 
@@ -154,8 +155,7 @@ def run_agent_graph(query: str | bytes, query_type: str = "text") -> str:
 
         else:
             # input_data = {"query": query, "messages": []}
-            input_data = {"query": query}
-
+            input_data = {"query": query, "api_agent_messages": [HumanMessage(content=query)]}
 
         assistant_graph = graph_manager.get_graph(query_type)
 #===================================================================================================================================
